@@ -5,19 +5,21 @@ using PRN222_Assignment_01.ViewModel;
 namespace PRN222_Assignment_01.Repositories
 {
 
-
     public interface ISystemAccountRepository
     {
         List<SystemAccount> GetAccounts(out string message);
         void CreateAccount(SystemAccount newAccount, out string message);
-        void UpdateAccount(string email, SystemAccount updateAccount);
-        void DeleteAccount(string email);
+        void UpdateAccount(int id, SystemAccount updateAccount, out string message);
+        void DeleteAccount(int id, out string message);
         List<SystemAccount> SearchAccount(string searchNameAccount);
         int Login(AccountLogin accountLogin, out string message);
+        SystemAccount GetAccount(int id, out string message);
     }
 
     public class SystemAccountRepository : ISystemAccountRepository
     {
+        private string EMAIL_ADMIN;
+        private string PASSWORD_ADMIN;
         private readonly FunewsManagementContext _context;
         private readonly IConfiguration _configuration;
 
@@ -25,6 +27,8 @@ namespace PRN222_Assignment_01.Repositories
         {
             _context = context;
             _configuration = configuration;
+            EMAIL_ADMIN = _configuration.GetSection("AdminAccount")["Email"];
+            PASSWORD_ADMIN = _configuration.GetSection("AdminAccount")["Password"];
         }
 
         public void CreateAccount(SystemAccount newAccount, out string message)
@@ -37,30 +41,32 @@ namespace PRN222_Assignment_01.Repositories
             }
             else
             {
+                if (IsEmailExit(newAccount.AccountEmail) || newAccount.AccountEmail.Equals(EMAIL_ADMIN))
+                {
+                    message = "Email is exist!";
+                    return;
+                }
                 _context.Add<SystemAccount>(newAccount);
                 _context.SaveChanges();
             }
         }
 
-        public void DeleteAccount(string email)
+        public void DeleteAccount(int id, out string message)
         {
-            if (email.IsNullOrEmpty())
+            message = "";
+            if (id == 0)
             {
-
+                message = "AccountId is invalid!";
+                return;
             }
-            else
+            SystemAccount account = _context.SystemAccounts.FirstOrDefault(x => x.AccountId == id);
+            if (account == null)
             {
-                SystemAccount account = _context.SystemAccounts.Find(email);
-                if (account == null)
-                {
-
-                }
-                else
-                {
-                    _context.Remove<SystemAccount>(account);
-                    _context.SaveChanges();
-                }
+                message = "Account is not exist!";
+                return;
             }
+            _context.Remove<SystemAccount>(account);
+            _context.SaveChanges();
         }
 
         public List<SystemAccount> GetAccounts(out string message)
@@ -86,30 +92,47 @@ namespace PRN222_Assignment_01.Repositories
             throw new NotImplementedException();
         }
 
-        public void UpdateAccount(string email, SystemAccount updateAccount)
+        public void UpdateAccount(int id, SystemAccount updateAccount, out string message)
         {
-            throw new NotImplementedException();
+            message = "";
+            var account = _context.SystemAccounts.FirstOrDefault(y => y.AccountId == id);
+            if (account == null)
+            {
+                message = "Account is not exist!";
+                return;
+            }
+            if (!account.AccountEmail.Equals(updateAccount.AccountEmail))
+            {
+                if (IsEmailExit(updateAccount.AccountEmail))
+                {
+                    message = "Email is exist!";
+                    return;
+                }
+                account.AccountEmail = updateAccount.AccountEmail;
+            }
+            account.AccountName = updateAccount.AccountName;
+            account.AccountRole = updateAccount.AccountRole;
+            _context.SystemAccounts.Update(account);
+            _context.SaveChanges();
         }
 
         public int Login(AccountLogin accountLogin, out string message)
         {
             message = "";
-            string email = _configuration.GetSection("AdminAccount")["Email"];
-            string password = _configuration.GetSection("AdminAccount")["Password"];
             if (accountLogin == null)
             {
                 message = "Tài khoản không đúng!";
                 return 0;
             }
 
-            bool checkEmailAdmin = accountLogin.AccountEmail.Equals(email);
+            bool checkEmailAdmin = accountLogin.AccountEmail.Equals(EMAIL_ADMIN);
             if (!IsEmailExit(accountLogin.AccountEmail) && !checkEmailAdmin)
             {
                 message = "Email không tồn tại!";
                 return 0;
             }
 
-            bool checkPassword = accountLogin.Password.Equals(password);
+            bool checkPassword = accountLogin.Password.Equals(PASSWORD_ADMIN);
             if (checkEmailAdmin && checkPassword)
             {
                 message = "";
@@ -128,6 +151,26 @@ namespace PRN222_Assignment_01.Repositories
                     message = "";
                     return account.AccountRole;
                 }
+            }
+        }
+
+        public SystemAccount GetAccount(int id, out string message)
+        {
+            var account = new SystemAccount();
+            message = "";
+            if (id == 0)
+            {
+                message = "AccountID is invalid!";
+                return account;
+            }
+            else
+            {
+                account = _context.SystemAccounts.FirstOrDefault(x => x.AccountId == id);
+                if (account == null)
+                {
+                    message = "Account is not exits!";
+                }
+                return account;
             }
         }
     }

@@ -1,17 +1,18 @@
-﻿@model PRN222_Assignment_01.Models.SystemAccount
+﻿@model PRN222_Assignment_01.Models.SystemAccount;
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Create</h1>
+<h1>Update</h1>
 
 @* <h4>SystemAccount</h4> *@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="AccountId" />
             <div class="form-group">
                 <label asp-for="AccountName" class="control-label"></label>
                 <input asp-for="AccountName" class="form-control" />
@@ -27,14 +28,10 @@
                 <input asp-for="AccountRole" class="form-control" />
                 <span asp-validation-for="AccountRole" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="AccountPassword" class="control-label"></label>
-                <input asp-for="AccountPassword" class="form-control" />
-                <span asp-validation-for="AccountPassword" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="AccountPassword" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -45,5 +42,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -7,10 +7,18 @@
 
 <h1>Accounts</h1>
 
+@if (ViewBag.ErrorMessage != null)
+{
+    <div style="color: red; margin-bottom: 10px;">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
 <p>
-    <a asp-action="Create">Create new account</a>
+    <a asp-action="Create" class="btn btn-primary">Create new account</a>
 </p>
-<table class="table">
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>
@@ -23,32 +31,39 @@
                 @Html.DisplayNameFor(model => model.AccountRole)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccountPassword)
+                Mật khẩu
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountRole)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountPassword)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AccountId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AccountId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccountName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccountEmail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccountRole)
+                </td>
+                <td>
+                    ******** @* Ẩn mật khẩu *@
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.AccountId" class="btn btn-sm btn-warning">Edit</a>
+                    @* <a asp-action="Details" asp-route-id="@item.AccountId" class="btn btn-sm btn-info">Details</a> *@
+                    <a asp-action="Delete" asp-route-id="@item.AccountId" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        
+    </script>
+}
