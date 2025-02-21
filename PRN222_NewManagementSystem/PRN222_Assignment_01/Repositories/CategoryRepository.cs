@@ -1,4 +1,5 @@
 ﻿using PRN222_Assignment_01.Models;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 
 namespace PRN222_Assignment_01.Repositories
@@ -44,6 +45,11 @@ namespace PRN222_Assignment_01.Repositories
             if(id == 0 || category == null)
             {
                 message = "Category is not exist!";
+                return;
+            }
+            if(IsExitCategoryInNewsArticle(id))
+            {
+                message = "Cannot delete category because there is an article in use.";
                 return;
             }
             if (category != null)
@@ -115,6 +121,11 @@ namespace PRN222_Assignment_01.Repositories
             var category = _context.Categories.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
             if (category == null) return false;
             return true;
+        }
+
+        private bool IsExitCategoryInNewsArticle(int categoryId)
+        {
+            return _context.NewsArticles.Any(x => x.CategoryID == categoryId);
         }
     }
 }

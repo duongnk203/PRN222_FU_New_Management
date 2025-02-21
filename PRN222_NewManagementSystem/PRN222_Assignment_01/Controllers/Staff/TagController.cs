@@ -14,10 +14,17 @@ namespace PRN222_Assignment_01.Controllers.Staff
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString)
         {
             var message = "";
             var tags = _tagRepository.GetTags(out message);
+            if (!string.IsNullOrEmpty(searchString) && tags.Count > 0)
+            {
+                tags = tags
+                    .Where(n => n.TagName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                             || n.Note.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
             if (tags == null || !message.IsNullOrEmpty())
             {
                 ModelState.AddModelError(string.Empty,message); 

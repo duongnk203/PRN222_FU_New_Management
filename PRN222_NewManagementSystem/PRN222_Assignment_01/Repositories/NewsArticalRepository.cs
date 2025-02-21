@@ -1,5 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
+using PRN222_Assignment_01.Service;
 using System.Runtime.InteropServices;
 
 namespace PRN222_Assignment_01.Repositories
@@ -122,44 +124,66 @@ namespace PRN222_Assignment_01.Repositories
 
     public interface INewsArticalRepository
     {
-        void Create(NewsArticle newsArticle, out string message);
-        void Update(string id, NewsArticle newsArticleUpdate, out string message);
-        void Delete(string id, out string message);
-        List<NewsArticle> GetNewsArticles(out string message);
-        NewsArticle GetNewsArticle(string id, out string message);
-        List<NewsArticle> GetNewsArticlesByCreated(int id, out string message);
+        void Create(int accountID, NewsArticle newsArticle, out string message);
+        void Update(int id, int accountId, NewsArticle newsArticleUpdate, out NewsArticle newsArticleAfterUpdate,out string message);
+        void Delete(int id, out string message);
+        List<NewsArticle> GetNewsArticles(int role, out string message);
+        NewsArticle GetNewsArticle(int id, int role,out string message);
+        List<NewsArticle> GetNewsArticlesByCreated(int createdId, out string message);
     }
 
     public class NewsArticalRepository : INewsArticalRepository
     {
         private readonly FUNewsManagementContext _context;
-        public NewsArticalRepository(FUNewsManagementContext context)
+        private readonly IEmailService _emailService;
+        public NewsArticalRepository(FUNewsManagementContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
-        public void Create(NewsArticle newsArticle, out string message)
+        public void Create(int accountID, NewsArticle newsArticle, out string message)
         {
             message = "";
             if (newsArticle == null)
             {
-                message = "News Article is not create!";
+                message = "News Article is not created!";
                 return;
             }
 
+            // Gán thông tin người tạo
+            newsArticle.CreatedByID = (short)accountID;
+            newsArticle.CreatedDate = DateTime.Now;
+
+            // Thêm vào database
             _context.NewsArticles.Add(newsArticle);
-            _context.SaveChanges();
+            _context.SaveChanges(); // Lúc này ID sẽ được cập nhật
+
+            // Tạo link chi tiết của bài viết
+            string articleLink = $"https://localhost:7135/Lecturer/NewsArticleView/Details?id={newsArticle.NewsArticleID}";
+
+            // Nếu bài viết được publish (NewsStatus == true) thì gửi email
+            if (newsArticle.NewsStatus == true)
+            {
+                _emailService.SendEmail(
+                    "duongnk203@gmail.com",
+                    $"{newsArticle.NewsTitle}",
+                    $"Author ID: {newsArticle.CreatedByID}. <br> Click <a href='{articleLink}'>here</a> to view the article.",
+                    articleLink
+                );
+            }
         }
 
-        public void Delete(string id, out string message)
+
+        public void Delete(int id, out string message)
         {
             message = "";
-            if (id.IsNullOrEmpty())
+            if (id == 0)
             {
                 message = "News article is not exist!";
                 return;
             }
-            var newsArticle = GetNewsArticle(id, out message);
+            var newsArticle = GetNewsArticle(id, 0, out message);
             if (newsArticle == null || !message.IsNullOrEmpty())
             {
                 return;
@@ -168,14 +192,16 @@ namespace PRN222_Assignment_01.Repositories
             _context.SaveChanges();
         }
 
-        public NewsArticle GetNewsArticle(string id, out string message)
+        public NewsArticle GetNewsArticle(int id,int role , out string message)
         {
             message = "";
-            if (id.IsNullOrEmpty())
+            if (id == 0)
             {
                 message = "News Article id is not exist!";
             }
-            var newsArticle = _context.NewsArticles.FirstOrDefault(x => x.NewsArticleID.Equals(id));
+            NewsArticle newsArticle = new NewsArticle(); 
+            if(role == 2) newsArticle = _context.NewsArticles.FirstOrDefault(x => x.NewsArticleID.Equals(id) && x.NewsStatus == true);
+            newsArticle = _context.NewsArticles.FirstOrDefault(x => x.NewsArticleID.Equals(id));
             if (newsArticle == null)
             {
                 message = "News Article id is not exist!";
@@ -183,10 +209,11 @@ namespace PRN222_Assignment_01.Repositories
             return newsArticle;
         }
 
-        public List<NewsArticle> GetNewsArticles(out string message)
+        public List<NewsArticle> GetNewsArticles(int role, out string message)
         {
             message = "";
             List<NewsArticle> newsArticles = _context.NewsArticles.ToList();
+            if(role == 2) newsArticles = newsArticles.Where(x => x.NewsStatus == true).ToList();
             if (newsArticles.Count == 0)
             {
                 message = "The list news article is empty";
@@ -194,16 +221,17 @@ namespace PRN222_Assignment_01.Repositories
             return newsArticles;
         }
 
-        public void Update(string id, NewsArticle newsArticleUpdate, out string message)
+        public void Update(int id, int accountId, NewsArticle newsArticleUpdate, out NewsArticle newsArticleAfterUpdate, out string message)
         {
+            newsArticleAfterUpdate = newsArticleUpdate;
             message = "";
-            if (id.IsNullOrEmpty())
+            if (id == 0)
             {
                 message = "News article is not exist!";
                 return;
             }
-            var newsArticle = GetNewsArticle(id, out message);
-            if (message.IsNullOrEmpty() || newsArticle == null)
+            var newsArticle = GetNewsArticle(id, 0,out message);
+            if (!message.IsNullOrEmpty() || newsArticle == null)
             {
                 return;
             }
@@ -213,9 +241,17 @@ namespace PRN222_Assignment_01.Repositories
                 message = "Title is exist!";
                 return;
             }
-            newsArticle = newsArticleUpdate;
-            _context.NewsArticles.Update(newsArticle);
+            newsArticle.Headline = newsArticleUpdate.Headline;
+            newsArticle.NewsContent = newsArticleUpdate.NewsContent;
+            newsArticle.NewsStatus = newsArticleUpdate.NewsStatus;
+            newsArticle.NewsSource = newsArticleUpdate.NewsSource;
+            newsArticle.NewsTitle = newsArticleUpdate.NewsTitle;
+            newsArticle.NewsTags = newsArticleUpdate.NewsTags;
+            newsArticle.UpdatedByID = (short)accountId;
+            newsArticle.ModifiedDate = DateTime.Now;
+            _context.Update(newsArticle);
             _context.SaveChanges();
+            newsArticleAfterUpdate = newsArticleUpdate;
         }
         public bool IsExitNewTitle(string title)
         {

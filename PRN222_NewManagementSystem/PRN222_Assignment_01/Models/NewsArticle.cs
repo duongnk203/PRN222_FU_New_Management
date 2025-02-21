@@ -12,8 +12,7 @@ namespace PRN222_Assignment_01.Models;
 public partial class NewsArticle
 {
     [Key]
-    [StringLength(20)]
-    public string NewsArticleID { get; set; }
+    public int NewsArticleID { get; set; }
 
     [StringLength(400)]
     public string NewsTitle { get; set; }

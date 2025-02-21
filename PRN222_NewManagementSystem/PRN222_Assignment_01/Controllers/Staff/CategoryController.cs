@@ -15,10 +15,18 @@ namespace PRN222_Assignment_01.Controllers.Staff
             _categoryRepository = categoryRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string searchString)
         {
             var message = "";
             var categories = _categoryRepository.GetCategories(out message);
+            if (!string.IsNullOrEmpty(searchString) && categories.Count > 0)
+            {
+                categories = categories
+                    .Where(n => n.CategoryName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                             || n.CategoryDesciption.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
             if (!message.IsNullOrEmpty())
             {
                 ViewBag.Message = message;
@@ -105,7 +113,7 @@ namespace PRN222_Assignment_01.Controllers.Staff
             _categoryRepository.Delete(id ?? 0, out message);
             if (!message.IsNullOrEmpty())
             {
-                ViewBag.Message = message;
+                TempData["Message"] = message;
             }
 
             return RedirectToAction(nameof(Index));

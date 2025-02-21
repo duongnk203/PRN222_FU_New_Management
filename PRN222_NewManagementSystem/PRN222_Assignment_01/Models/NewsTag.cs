@@ -13,8 +13,7 @@ namespace PRN222_Assignment_01.Models;
 public partial class NewsTag
 {
     [Key]
-    [StringLength(20)]
-    public string NewsArticleID { get; set; }
+    public int NewsArticleID { get; set; }
 
     [Key]
     public int TagID { get; set; }

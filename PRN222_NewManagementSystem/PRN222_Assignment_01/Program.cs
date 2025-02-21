@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.Repositories;
+using PRN222_Assignment_01.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<INewsArticalRepository, NewsArticalRepository>();
 builder.Services.AddTransient<ITagRepository, TagRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

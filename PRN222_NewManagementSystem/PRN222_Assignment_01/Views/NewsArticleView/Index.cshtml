@@ -1,0 +1,91 @@
+﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
+
+@{
+    ViewData["Title"] = "News Article";
+    Layout = "~/Views/Shared/_LayoutLecturer.cshtml";
+}
+
+<h1>News Article</h1>
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search news..." value="@Context.Request.Query["searchString"]">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Headline)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+@*             <th>
+                @Html.DisplayNameFor(model => model.NewsContent)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.NewsSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedByID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModifiedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CategoryID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedByID)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Headline)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+@*             <td>
+                @Html.DisplayFor(modelItem => item.NewsContent)
+            </td> *@
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsSource)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedByID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModifiedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedByID)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

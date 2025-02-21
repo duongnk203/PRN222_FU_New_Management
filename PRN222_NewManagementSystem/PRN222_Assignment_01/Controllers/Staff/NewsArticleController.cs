@@ -6,6 +6,7 @@ using PRN222_Assignment_01.Repositories;
 
 namespace PRN222_Assignment_01.Controllers.Staff
 {
+    [Route("Staff/NewsArticleView")]
     public class NewsArticleController : Controller
     {
         private readonly INewsArticalRepository _newsArticalRepository;
@@ -18,21 +19,31 @@ namespace PRN222_Assignment_01.Controllers.Staff
             _systemAccountRepository = systemAccountRepository;
         }
 
-        public IActionResult Index()
+        [Route("Index")]
+        public IActionResult Index(string searchString)
         {
             var message = "";
-            var newsArticles = _newsArticalRepository.GetNewsArticles(out message);
-            if (!message.IsNullOrEmpty())
+            var newsArticles = _newsArticalRepository.GetNewsArticles(0, out message);
+            if(!string.IsNullOrEmpty(searchString) && newsArticles.Count > 0)
             {
-                ViewBag.message = message;
+                newsArticles = newsArticles
+                    .Where(n => n.NewsTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                             || n.Headline.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                ModelState.AddModelError(string.Empty, message);
             }
             return View(newsArticles);
         }
 
-        public IActionResult Details(string? id)
+        [Route("Details")]
+        public IActionResult Details(int? id)
         {
             var message = "";
-            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? "", out message);
+            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? 0, 0,out message);
             if (!message.IsNullOrEmpty() || newsArticle == null)
             {
                 ModelState.AddModelError(string.Empty, message);
@@ -41,21 +52,49 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticle);
         }
 
+        [Route("Create")]
         public IActionResult Create()
         {
+            var message = "";
+            var categoryIds = _categoryRepository.GetCategoryIds(out message);
+
+            ViewBag.CategoryId = categoryIds.Select(x => new SelectListItem
+            {
+                Value = x.ToString(),
+                Text = x.ToString()
+            }).ToList();
+            ViewBag.CreatedById = _systemAccountRepository.GetAccountIds(out message).Select(x => new SelectListItem
+            {
+                Value = x.ToString(),
+                Text = x.ToString()
+            }).ToList();
             return View();
         }
 
+        [Route("Create")]
         [HttpPost]
         public IActionResult Create(NewsArticle newsArticle)
         {
-            return View();
+            var message = "";
+            if (HttpContext.Session.GetString("AccountID") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var accountId = Int32.Parse(HttpContext.Session.GetString("AccountID"));
+            _newsArticalRepository.Create(accountId, newsArticle, out message);
+            if (!string.IsNullOrEmpty(message))
+            {
+                ModelState.AddModelError(string.Empty, message);
+                return View(newsArticle);
+            }
+            return View(newsArticle);
         }
 
-        public IActionResult Edit(string? id)
+        [Route("Edit")]
+        public IActionResult Edit(int? id)
         {
             var message = "";
-            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? "", out message);
+            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? 0, 0, out message);
 
             var categoryIds = _categoryRepository.GetCategoryIds(out message);
 
@@ -79,11 +118,24 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticle);
         }
 
+        [Route("Edit")]
         [HttpPost]
-        public IActionResult Edit(string? id, NewsArticle newsArticleUpdate)
+        public IActionResult Edit(int? id, NewsArticle newsArticleUpdate)
         {
             var message = "";
-            _newsArticalRepository.Update(id ?? "", newsArticleUpdate, out message);
+            if (HttpContext.Session.GetString("AccountID") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var categoryIds = _categoryRepository.GetCategoryIds(out message);
+
+            ViewBag.CategoryId = categoryIds.Select(x => new SelectListItem
+            {
+                Value = x.ToString(),
+                Text = x.ToString()
+            }).ToList();
+            var accountId = Int32.Parse(HttpContext.Session.GetString("AccountID"));
+            _newsArticalRepository.Update(id ?? 0, accountId, newsArticleUpdate, out newsArticleUpdate, out message);
             if (!message.IsNullOrEmpty())
             {
                 ModelState.AddModelError(string.Empty, message);
@@ -92,15 +144,16 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticleUpdate);
         }
 
-        public IActionResult Delete(string? id)
+        [Route("Delete")]
+        public IActionResult Delete(int? id)
         {
             var message = "";
-            _newsArticalRepository.Delete(id ?? "", out message);
+            _newsArticalRepository.Delete(id ?? 0, out message);
             if (!message.IsNullOrEmpty())
             {
                 ViewBag.Message = message;
             }
-            return View();
+            return RedirectToAction(nameof(Index));
         }
 
     }

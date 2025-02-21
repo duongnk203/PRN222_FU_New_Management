@@ -10,6 +10,19 @@
 <p>
     <a asp-action="Create">Create New Category</a>
 </p>
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search news..." value="@Context.Request.Query["searchString"]">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <table class="table">
     <thead>
         <tr>

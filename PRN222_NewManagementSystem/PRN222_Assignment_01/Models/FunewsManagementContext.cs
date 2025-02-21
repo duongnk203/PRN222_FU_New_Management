@@ -27,7 +27,6 @@ public partial class FUNewsManagementContext : DbContext
 
     public virtual DbSet<Tag> Tags { get; set; }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>(entity =>

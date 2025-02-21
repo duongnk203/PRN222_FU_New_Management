@@ -1,15 +1,22 @@
 ﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
 
 @{
-    ViewData["Title"] = "News Article";
+    ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutStaff.cshtml";
 }
 
-<h1>News Article</h1>
+<h1>View news article</h1>
 
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search news..." value="@Context.Request.Query["searchString"]">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
 <p>
     <a asp-action="Create">Create New News Article</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
@@ -22,7 +29,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
-@*             <th>
+            @*             <th>
                 @Html.DisplayNameFor(model => model.NewsContent)
             </th> *@
             <th>
@@ -38,53 +45,54 @@
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedByID)
+                @Html.DisplayNameFor(model => model.CategoryID)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryID)
+                @Html.DisplayNameFor(model => model.CreatedByID)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Headline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-@*             <td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Headline)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                @*             <td>
                 @Html.DisplayFor(modelItem => item.NewsContent)
             </td> *@
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsSource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedByID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedByID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsSource)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedByID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifiedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedByID)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.NewsArticleID" onclick="return confirm('Are you sure delete this news article?')">Delete</a>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

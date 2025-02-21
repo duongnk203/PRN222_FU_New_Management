@@ -35,7 +35,7 @@ namespace PRN222_Assignment_01.Controllers.Authentincation
                 case 1: // Staff
                     return RedirectToAction("Index", "Category");
                 case 2: //Lecture
-                    return View();
+                    return RedirectToAction("Index", "NewsArticleView", new { controller = "NewsArticleView", area = "Lecturer" });
                 case 3: //Admin
                     return RedirectToAction("Index", "Account");
                 default:

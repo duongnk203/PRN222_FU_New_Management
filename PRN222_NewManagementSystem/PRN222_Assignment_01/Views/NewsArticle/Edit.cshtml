@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
+                <input readonly asp-for="CreatedDate" class="form-control" />
                 <span asp-validation-for="CreatedDate" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -41,7 +41,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="CategoryID" class="control-label"></label>
-                <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.CategoryID"></select>
                 <span asp-validation-for="CategoryID" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -51,17 +51,17 @@
             </div>
             <div class="form-group">
                 <label asp-for="CreatedByID" class="control-label"></label>
-                <select asp-for="CreatedByID" class="form-control" asp-items="ViewBag.CreatedById"></select>
+                <select disabled asp-for="CreatedByID" class="form-control" asp-items="ViewBag.CreatedByID"></select>
                 <span asp-validation-for="CreatedByID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="UpdatedByID" class="control-label"></label>
-                <input asp-for="UpdatedByID" class="form-control" />
+                <input readonly asp-for="UpdatedByID" class="form-control" />
                 <span asp-validation-for="UpdatedByID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ModifiedDate" class="control-label"></label>
-                <input asp-for="ModifiedDate" class="form-control" />
+                <input readonly asp-for="ModifiedDate" class="form-control" />
                 <span asp-validation-for="ModifiedDate" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: yellow;
+            padding: 5px;
+            display: inline-block;
+        }
+
+        .content {
+            margin-top: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+            .button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <p class="title">Send Email Notifications for New Articles</p>
+
+        <div class="content">
+            <ul>
+                <li>When a new article is published, the system sends an email notification to the Admin.</li>
+                <li>The email includes the article title, author, and a link to view the article.</li>
+                <li>Use an email-sending service in ASP.NET Core (e.g., SMTP or MailKit).</li>
+            </ul>
+        </div>
+
+        <a href="[ARTICLE_LINK]" class="button">View Article</a>
+    </div>
+
+</body>
+</html>
