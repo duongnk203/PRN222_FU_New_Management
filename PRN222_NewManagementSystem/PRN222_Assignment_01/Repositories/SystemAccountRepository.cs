@@ -14,6 +14,7 @@ namespace PRN222_Assignment_01.Repositories
         List<SystemAccount> SearchAccount(string searchNameAccount);
         int Login(AccountLogin accountLogin, out string message);
         SystemAccount GetAccount(int id, out string message);
+        List<int> GetAccountIds(out string message);
     }
 
     public class SystemAccountRepository : ISystemAccountRepository
@@ -172,6 +173,15 @@ namespace PRN222_Assignment_01.Repositories
                 }
                 return account;
             }
+        }
+
+        public List<int> GetAccountIds(out string message)
+        {
+            message = "";
+            List<int> getAccountIds = _context.SystemAccounts.Select(x => x.AccountId).ToList().ConvertAll(x => (int)x);
+            if (getAccountIds.Count == 0)
+                message = "The list account is empty";
+            return getAccountIds;
         }
     }
 }

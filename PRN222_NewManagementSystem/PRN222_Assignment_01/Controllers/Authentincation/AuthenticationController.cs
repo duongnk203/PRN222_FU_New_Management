@@ -33,7 +33,7 @@ namespace PRN222_Assignment_01.Controllers.Authentincation
             switch (role)
             {
                 case 1: // Staff
-                    return View();
+                    return RedirectToAction("Index", "Category");
                 case 2: //Lecture
                     return View();
                 case 3: //Admin

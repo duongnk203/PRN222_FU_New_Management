@@ -15,6 +15,9 @@ builder.Services.AddDbContext<FunewsManagementContext>(options =>
  options.UseSqlServer(connectionsString));
 
 builder.Services.AddTransient<ISystemAccountRepository, SystemAccountRepository>();
+builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+builder.Services.AddTransient<INewsArticalRepository, NewsArticalRepository>();
+builder.Services.AddTransient<ITagRepository, TagRepository>();
 
 var app = builder.Build();
 

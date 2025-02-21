@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Staff\" />
     <Folder Include="Views\Home\" />
   </ItemGroup>
 
