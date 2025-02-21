@@ -53,9 +53,9 @@
                     ******** @* Ẩn mật khẩu *@
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.AccountId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@item.AccountID" class="btn btn-sm btn-warning">Edit</a>
                     @* <a asp-action="Details" asp-route-id="@item.AccountId" class="btn btn-sm btn-info">Details</a> *@
-                    <a asp-action="Delete" asp-route-id="@item.AccountId" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.AccountID" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Delete</a>
                 </td>
             </tr>
         }

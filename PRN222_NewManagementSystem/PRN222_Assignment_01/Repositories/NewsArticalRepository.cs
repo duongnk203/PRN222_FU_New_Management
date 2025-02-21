@@ -1,12 +1,13 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
+using System.Runtime.InteropServices;
 
 namespace PRN222_Assignment_01.Repositories
 {
     public interface INewsArticalRepository
     {
         void Create(NewsArticle newsArticle, out string message);
-        void Update(string id, NewsArticle newsArticleUpdate ,out string message);
+        void Update(string id, NewsArticle newsArticleUpdate, out string message);
         void Delete(string id, out string message);
         List<NewsArticle> GetNewsArticles(out string message);
         NewsArticle GetNewsArticle(string id, out string message);
@@ -16,13 +17,14 @@ namespace PRN222_Assignment_01.Repositories
     {
         void Create(Tag newsTag, out string message);
         void Delete(int id, out string message);
-        Tag GetTag(int id, out string message);    
+        Tag GetTag(int id, out string message);
+        List<Tag> GetTags(out string message);
     }
 
     public class TagRepository : ITagRepository
     {
-        private readonly FunewsManagementContext _context;
-        public TagRepository(FunewsManagementContext context)
+        private readonly FUNewsManagementContext _context;
+        public TagRepository(FUNewsManagementContext context)
         {
             _context = context;
         }
@@ -35,7 +37,7 @@ namespace PRN222_Assignment_01.Repositories
                 message = "Tag is not create!";
                 return;
             }
-            if(IsExistTag(newsTag.TagName))
+            if (IsExistTag(newsTag.TagName))
             {
                 message = "Tag name is exist!";
                 return;
@@ -65,11 +67,11 @@ namespace PRN222_Assignment_01.Repositories
         public Tag GetTag(int id, out string message)
         {
             message = "";
-            if(id == 0)
+            if (id == 0)
             {
                 message = "TagId is invalid";
             }
-            var tag = _context.Tags.FirstOrDefault(x => x.TagId == id);
+            var tag = _context.Tags.FirstOrDefault(x => x.TagID == id);
             if (tag == null)
             {
                 message = "Tag is not exist!";
@@ -81,12 +83,23 @@ namespace PRN222_Assignment_01.Repositories
         {
             return _context.Tags.FirstOrDefault(t => t.TagName == tagName) != null;
         }
+
+        public List<Tag> GetTags(out string message)
+        {
+            message = "";
+            var tags = _context.Tags.ToList();
+            if (tags.Count == 0)
+            {
+                message = "The list tag is empty!";
+            }
+            return tags;
+        }
     }
 
     public class NewsArticalRepository : INewsArticalRepository
     {
-        private readonly FunewsManagementContext _context;
-        public NewsArticalRepository(FunewsManagementContext context)
+        private readonly FUNewsManagementContext _context;
+        public NewsArticalRepository(FUNewsManagementContext context)
         {
             _context = context;
         }
@@ -94,7 +107,7 @@ namespace PRN222_Assignment_01.Repositories
         public void Create(NewsArticle newsArticle, out string message)
         {
             message = "";
-            if(newsArticle == null)
+            if (newsArticle == null)
             {
                 message = "News Article is not create!";
                 return;
@@ -107,7 +120,7 @@ namespace PRN222_Assignment_01.Repositories
         public void Delete(string id, out string message)
         {
             message = "";
-            if(id.IsNullOrEmpty())
+            if (id.IsNullOrEmpty())
             {
                 message = "News article is not exist!";
                 return;
@@ -124,15 +137,15 @@ namespace PRN222_Assignment_01.Repositories
         public NewsArticle GetNewsArticle(string id, out string message)
         {
             message = "";
-            if(id.IsNullOrEmpty())
+            if (id.IsNullOrEmpty())
             {
                 message = "News Article id is not exist!";
             }
-            var newsArticle = _context.NewsArticles.FirstOrDefault(x => x.NewsArticleId.Equals(id));
-            if(newsArticle == null) 
-                {
-                    message = "News Article id is not exist!";
-                }
+            var newsArticle = _context.NewsArticles.FirstOrDefault(x => x.NewsArticleID.Equals(id));
+            if (newsArticle == null)
+            {
+                message = "News Article id is not exist!";
+            }
             return newsArticle;
         }
 
@@ -140,7 +153,7 @@ namespace PRN222_Assignment_01.Repositories
         {
             message = "";
             List<NewsArticle> newsArticles = _context.NewsArticles.ToList();
-            if(newsArticles.Count == 0)
+            if (newsArticles.Count == 0)
             {
                 message = "The list news article is empty";
             }
@@ -156,12 +169,12 @@ namespace PRN222_Assignment_01.Repositories
                 return;
             }
             var newsArticle = GetNewsArticle(id, out message);
-            if(message.IsNullOrEmpty() || newsArticle == null)
+            if (message.IsNullOrEmpty() || newsArticle == null)
             {
                 return;
             }
-            
-            if(IsExitNewTitle(newsArticleUpdate.NewsTitle) && !newsArticleUpdate.NewsTitle.Equals(newsArticle.NewsTitle))
+
+            if (IsExitNewTitle(newsArticleUpdate.NewsTitle) && !newsArticleUpdate.NewsTitle.Equals(newsArticle.NewsTitle))
             {
                 message = "Title is exist!";
                 return;

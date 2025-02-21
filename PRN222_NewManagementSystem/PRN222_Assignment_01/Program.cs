@@ -9,9 +9,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Configuration.AddJsonFile("appsettings.json");
 
-var connectionsString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionsString = builder.Configuration.GetConnectionString("FUNewsManagement");
 
-builder.Services.AddDbContext<FunewsManagementContext>(options =>
+builder.Services.AddDbContext<FUNewsManagementContext>(options =>
  options.UseSqlServer(connectionsString));
 
 builder.Services.AddTransient<ISystemAccountRepository, SystemAccountRepository>();

@@ -74,7 +74,7 @@ namespace PRN222_Assignment_01.Controllers.Admin
         public IActionResult Edit(int? id, SystemAccount accountUpdate)
         {
             var message = "";
-            if (id != accountUpdate.AccountId)
+            if (id != accountUpdate.AccountID)
             {
                 return NotFound();
             }

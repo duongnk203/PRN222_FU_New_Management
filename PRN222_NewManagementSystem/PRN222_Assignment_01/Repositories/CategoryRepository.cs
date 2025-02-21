@@ -14,8 +14,8 @@ namespace PRN222_Assignment_01.Repositories
     }
     public class CategoryRepository : ICategoryRepository
     {
-        private readonly FunewsManagementContext _context;
-        public CategoryRepository(FunewsManagementContext context)
+        private readonly FUNewsManagementContext _context;
+        public CategoryRepository(FUNewsManagementContext context)
         {
             _context = context;
         }
@@ -40,7 +40,7 @@ namespace PRN222_Assignment_01.Repositories
         public void Delete(int id, out string message)
         {
             message = "";
-            var category = _context.Categories.FirstOrDefault(x => x.CategoryId == id);
+            var category = _context.Categories.FirstOrDefault(x => x.CategoryID == id);
             if(id == 0 || category == null)
             {
                 message = "Category is not exist!";
@@ -67,7 +67,7 @@ namespace PRN222_Assignment_01.Repositories
         public Category GetCategory(int id, out string message)
         {
             message = "";
-            var category = _context.Categories.FirstOrDefault(x => x.CategoryId == id);
+            var category = _context.Categories.FirstOrDefault(x => x.CategoryID == id);
             if (id == 0)
             {
                 message = "Category is not exits!";
@@ -78,7 +78,7 @@ namespace PRN222_Assignment_01.Repositories
         public List<int> GetCategoryIds(out string messsage)
         {
             messsage = "";
-            List<short> categoryIds = _context.Categories.Select(x => x.CategoryId).ToList();
+            List<short> categoryIds = _context.Categories.Select(x => x.CategoryID).ToList();
             return categoryIds.ConvertAll(x => (int)x);
         }
 
@@ -90,7 +90,7 @@ namespace PRN222_Assignment_01.Repositories
                 message = "CategoryId is not exist!";
                 return;
             }
-            var category = _context.Categories.FirstOrDefault(x => x.CategoryId == id);
+            var category = _context.Categories.FirstOrDefault(x => x.CategoryID == id);
             if (category == null)
             {
                 message = "Category is not exist!";
@@ -102,7 +102,7 @@ namespace PRN222_Assignment_01.Repositories
                 return;
             }
             category.CategoryName = newCategory.CategoryName;
-            category.ParentCategoryId = newCategory.ParentCategoryId;
+            category.ParentCategoryID = newCategory.ParentCategoryID;
             category.CategoryDesciption = newCategory.CategoryDesciption;
             category.IsActive = newCategory.IsActive;
             _context.Categories.Update(category);

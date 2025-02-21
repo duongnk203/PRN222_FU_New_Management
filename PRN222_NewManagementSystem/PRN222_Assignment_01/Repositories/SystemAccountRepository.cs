@@ -21,10 +21,10 @@ namespace PRN222_Assignment_01.Repositories
     {
         private string EMAIL_ADMIN;
         private string PASSWORD_ADMIN;
-        private readonly FunewsManagementContext _context;
+        private readonly FUNewsManagementContext _context;
         private readonly IConfiguration _configuration;
 
-        public SystemAccountRepository(FunewsManagementContext context, IConfiguration configuration)
+        public SystemAccountRepository(FUNewsManagementContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -60,7 +60,7 @@ namespace PRN222_Assignment_01.Repositories
                 message = "AccountId is invalid!";
                 return;
             }
-            SystemAccount account = _context.SystemAccounts.FirstOrDefault(x => x.AccountId == id);
+            SystemAccount account = _context.SystemAccounts.FirstOrDefault(x => x.AccountID == id);
             if (account == null)
             {
                 message = "Account is not exist!";
@@ -96,7 +96,7 @@ namespace PRN222_Assignment_01.Repositories
         public void UpdateAccount(int id, SystemAccount updateAccount, out string message)
         {
             message = "";
-            var account = _context.SystemAccounts.FirstOrDefault(y => y.AccountId == id);
+            var account = _context.SystemAccounts.FirstOrDefault(y => y.AccountID == id);
             if (account == null)
             {
                 message = "Account is not exist!";
@@ -166,7 +166,7 @@ namespace PRN222_Assignment_01.Repositories
             }
             else
             {
-                account = _context.SystemAccounts.FirstOrDefault(x => x.AccountId == id);
+                account = _context.SystemAccounts.FirstOrDefault(x => x.AccountID == id);
                 if (account == null)
                 {
                     message = "Account is not exits!";
@@ -178,7 +178,7 @@ namespace PRN222_Assignment_01.Repositories
         public List<int> GetAccountIds(out string message)
         {
             message = "";
-            List<int> getAccountIds = _context.SystemAccounts.Select(x => x.AccountId).ToList().ConvertAll(x => (int)x);
+            List<int> getAccountIds = _context.SystemAccounts.Select(x => x.AccountID).ToList().ConvertAll(x => (int)x);
             if (getAccountIds.Count == 0)
                 message = "The list account is empty";
             return getAccountIds;

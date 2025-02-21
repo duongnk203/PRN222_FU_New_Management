@@ -24,4 +24,8 @@
     <Folder Include="Views\Home\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="efpt.config.json.user" />
+  </ItemGroup>
+
 </Project>

@@ -32,16 +32,16 @@
                 @Html.DisplayNameFor(model => model.NewsStatus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedById)
+                @Html.DisplayNameFor(model => model.UpdatedByID)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedById)
+                @Html.DisplayNameFor(model => model.CreatedByID)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                @Html.DisplayNameFor(model => model.CategoryID)
             </th>
             <th></th>
         </tr>
@@ -68,21 +68,21 @@
                 @Html.DisplayFor(modelItem => item.NewsStatus)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UpdatedById)
+                @Html.DisplayFor(modelItem => item.UpdatedByID)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ModifiedDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedById)
+                @Html.DisplayFor(modelItem => item.CreatedByID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoryId)
+                @Html.DisplayFor(modelItem => item.CategoryID)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NewsArticleId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.NewsArticleID">Delete</a>
             </td>
         </tr>
 }
