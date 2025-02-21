@@ -46,7 +46,7 @@
             <td>
                 <a asp-action="Update" asp-route-id="@item.CategoryID">Edit</a> |
                     <a asp-action="Detail" asp-route-id="@item.CategoryID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.CategoryID">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.CategoryID" onclick="return confirm('Are you sure delete this category?')">Delete</a>
             </td>
         </tr>
 }

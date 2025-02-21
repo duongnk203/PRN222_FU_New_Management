@@ -4,21 +4,13 @@ using System.Runtime.InteropServices;
 
 namespace PRN222_Assignment_01.Repositories
 {
-    public interface INewsArticalRepository
-    {
-        void Create(NewsArticle newsArticle, out string message);
-        void Update(string id, NewsArticle newsArticleUpdate, out string message);
-        void Delete(string id, out string message);
-        List<NewsArticle> GetNewsArticles(out string message);
-        NewsArticle GetNewsArticle(string id, out string message);
-    }
-
     public interface ITagRepository
     {
         void Create(Tag newsTag, out string message);
         void Delete(int id, out string message);
         Tag GetTag(int id, out string message);
         List<Tag> GetTags(out string message);
+        void Update(int? id, Tag tagUpdate, out string message);
     }
 
     public class TagRepository : ITagRepository
@@ -55,7 +47,7 @@ namespace PRN222_Assignment_01.Repositories
                 return;
             }
             var tag = GetTag(id, out message);
-            if (tag == null || message.IsNullOrEmpty())
+            if (tag == null || !message.IsNullOrEmpty())
             {
                 message = "Tag is not exist!";
                 return;
@@ -94,6 +86,48 @@ namespace PRN222_Assignment_01.Repositories
             }
             return tags;
         }
+
+        public void Update(int? id, Tag tagUpdate, out string message)
+        {
+            message = "";
+            if (id == 0 || tagUpdate == null)
+            {
+                message = "Tag is not exist!";
+                return;
+            }
+            if (tagUpdate != null)
+            {
+                var tag = _context.Tags.FirstOrDefault(x => x.TagID == id);
+                if (tag == null)
+                {
+                    message = "Tag not found";
+                    return;
+                }
+                if (IsExistTag(tagUpdate.TagName) && !tag.TagName.Equals(tagUpdate.TagName))
+                {
+                    message = "Tag name is exist";
+                    return;
+                }
+
+                // Cập nhật các thuộc tính của tag từ tagUpdate
+                tag.TagName = tagUpdate.TagName;
+                tag.Note = tagUpdate.Note;
+                // Cập nhật các thuộc tính khác nếu cần
+
+                _context.Update(tag); // Không cần thiết, tag đã được theo dõi và thay đổi
+                _context.SaveChanges();
+            }
+        }
+    }
+
+    public interface INewsArticalRepository
+    {
+        void Create(NewsArticle newsArticle, out string message);
+        void Update(string id, NewsArticle newsArticleUpdate, out string message);
+        void Delete(string id, out string message);
+        List<NewsArticle> GetNewsArticles(out string message);
+        NewsArticle GetNewsArticle(string id, out string message);
+        List<NewsArticle> GetNewsArticlesByCreated(int id, out string message);
     }
 
     public class NewsArticalRepository : INewsArticalRepository
@@ -186,6 +220,17 @@ namespace PRN222_Assignment_01.Repositories
         public bool IsExitNewTitle(string title)
         {
             return _context.NewsArticles.FirstOrDefault(x => x.NewsTitle.Equals(title)) != null;
+        }
+
+        public List<NewsArticle> GetNewsArticlesByCreated(int id, out string message)
+        {
+            message = "";
+            List<NewsArticle> newsArticles = _context.NewsArticles.Where(x => x.CreatedByID == id).ToList();
+            if (newsArticles.Count == 0)
+            {
+                message = "The list news article is empty";
+            }
+            return newsArticles;
         }
     }
 }

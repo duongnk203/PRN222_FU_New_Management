@@ -47,6 +47,36 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newTag);
         }
 
+        public IActionResult Edit(int? id)
+        {
+            var message = "";
+            var tag = _tagRepository.GetTag(id ?? 0, out message);
+            if(tag == null || !message.IsNullOrEmpty())
+            {
+                message = "Tag is not exist!";
+            }
+            return View(tag);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int? id, Tag tagUpdate)
+        {
+            var message = "";
+            if (!ModelState.IsValid)
+            {
+                message = "Tag is invalid";
+                return View(tagUpdate);
+            }
+            _tagRepository.Update(id??0,tagUpdate, out message);
+            if (!message.IsNullOrEmpty())
+            {
+                ModelState.AddModelError(string.Empty, message);
+                return View(tagUpdate);
+            }
+
+            return View(tagUpdate);
+        }
+
         public IActionResult Delete(int? id)
         {
             var message = "";
@@ -55,7 +85,7 @@ namespace PRN222_Assignment_01.Controllers.Staff
             {
                 ViewBag.Message = message;
             }
-            return View();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

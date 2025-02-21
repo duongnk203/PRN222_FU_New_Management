@@ -14,10 +14,19 @@ var connectionsString = builder.Configuration.GetConnectionString("FUNewsManagem
 builder.Services.AddDbContext<FUNewsManagementContext>(options =>
  options.UseSqlServer(connectionsString));
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
 builder.Services.AddTransient<ISystemAccountRepository, SystemAccountRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<INewsArticalRepository, NewsArticalRepository>();
 builder.Services.AddTransient<ITagRepository, TagRepository>();
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
 
@@ -29,6 +38,7 @@ var app = builder.Build();
 //    app.UseHsts();
 //}
 
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

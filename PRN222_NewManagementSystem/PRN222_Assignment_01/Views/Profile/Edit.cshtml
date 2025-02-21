@@ -1,17 +1,17 @@
-﻿@model PRN222_Assignment_01.Models.SystemAccount;
+﻿@model PRN222_Assignment_01.Models.SystemAccount
 
 @{
     ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = "~/Views/Shared/_LayoutStaff.cshtml";
 }
 
-<h1>Update</h1>
+<h1>Edit</h1>
 
-@* <h4>SystemAccount</h4> *@
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="AccountID" />
             <div class="form-group">
                 <label asp-for="AccountName" class="control-label"></label>
@@ -25,11 +25,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="AccountRole" class="control-label"></label>
-                <input asp-for="AccountRole" class="form-control" />
+                <input readonly asp-for="AccountRole" class="form-control" />
                 <span asp-validation-for="AccountRole" class="text-danger"></span>
             </div>
-            <input type="hidden" asp-for="AccountPassword" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="AccountPassword" class="form-control" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -38,7 +37,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to Details</a>
+    <a asp-action="Details">Back to Details</a>
 </div>
 
 @section Scripts {

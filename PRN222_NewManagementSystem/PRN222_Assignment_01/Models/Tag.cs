@@ -14,9 +14,11 @@ public partial class Tag
     [Key]
     public int TagID { get; set; }
 
+    [Required]
     [StringLength(50)]
     public string TagName { get; set; }
 
+    [Required]
     [StringLength(400)]
     public string Note { get; set; }
 

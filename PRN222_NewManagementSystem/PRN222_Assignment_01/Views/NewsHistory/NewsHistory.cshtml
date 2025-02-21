@@ -1,0 +1,89 @@
+﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
+
+@{
+    ViewData["Title"] = "NewsHistory";
+    Layout = "~/Views/Shared/_LayoutStaff.cshtml";
+}
+
+<h1>View News History</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Headline)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsContent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NewsStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedByID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModifiedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Headline)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsContent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsSource)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedByID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifiedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CategoryDesciption)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedBy.AccountEmail)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.NewsArticleID">Delete</a>
+                </td>
+            </tr>
+        }
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    </tbody>
+</table>

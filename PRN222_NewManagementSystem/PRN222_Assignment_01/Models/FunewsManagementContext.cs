@@ -60,8 +60,6 @@ public partial class FUNewsManagementContext : DbContext
         modelBuilder.Entity<Tag>(entity =>
         {
             entity.HasKey(e => e.TagID).HasName("PK_HashTag");
-
-            entity.Property(e => e.TagID).ValueGeneratedNever();
         });
 
         OnModelCreatingPartial(modelBuilder);

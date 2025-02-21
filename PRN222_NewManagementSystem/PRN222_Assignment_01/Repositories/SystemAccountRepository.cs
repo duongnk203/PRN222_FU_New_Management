@@ -23,13 +23,15 @@ namespace PRN222_Assignment_01.Repositories
         private string PASSWORD_ADMIN;
         private readonly FUNewsManagementContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public SystemAccountRepository(FUNewsManagementContext context, IConfiguration configuration)
+        public SystemAccountRepository(FUNewsManagementContext context, IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             _context = context;
             _configuration = configuration;
             EMAIL_ADMIN = _configuration.GetSection("AdminAccount")["Email"];
             PASSWORD_ADMIN = _configuration.GetSection("AdminAccount")["Password"];
+            _contextAccessor = contextAccessor;
         }
 
         public void CreateAccount(SystemAccount newAccount, out string message)
@@ -149,7 +151,8 @@ namespace PRN222_Assignment_01.Repositories
                 }
                 else
                 {
-                    message = "";
+                    _contextAccessor.HttpContext.Session.SetString("AccountID", account.AccountID + "");
+                    _contextAccessor.HttpContext.Session.SetString("AccountEmail", account.AccountEmail);
                     return account.AccountRole;
                 }
             }
