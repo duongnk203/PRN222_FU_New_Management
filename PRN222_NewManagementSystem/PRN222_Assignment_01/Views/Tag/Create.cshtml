@@ -6,7 +6,12 @@
 }
 
 <h1>Create Tag</h1>
-
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <h4>Tag</h4>
 <hr />
 <div class="row">

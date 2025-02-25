@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 
 namespace PRN222_Assignment_01.Controllers.Staff
 {
+    [Authorize(Roles = "Staff")]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -38,20 +40,7 @@ namespace PRN222_Assignment_01.Controllers.Staff
         public IActionResult Create()
         {
             string message = "";
-            List<int> categoryIds = _categoryRepository.GetCategoryIds(out message);
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                // Xử lý lỗi (ví dụ: ghi log, hiển thị thông báo)
-            }
-
-            List<SelectListItem> selectListItems = categoryIds.Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString() // Hoặc lấy tên danh mục từ cơ sở dữ liệu
-            }).ToList();
-
-            ViewBag.ParentCategoryId = selectListItems;
+            ViewBag.ParentCategoryId = _categoryRepository.GetCategories_1(out message);
 
             return View();
         }
@@ -60,6 +49,8 @@ namespace PRN222_Assignment_01.Controllers.Staff
         public IActionResult Create(Category newCategory)
         {
             var message = "";
+            ViewBag.ParentCategoryId = _categoryRepository.GetCategories_1(out message);
+
             _categoryRepository.Create(newCategory, out message);
             if (!message.IsNullOrEmpty())
             {
@@ -78,20 +69,7 @@ namespace PRN222_Assignment_01.Controllers.Staff
             {
                 return NotFound();
             }
-            List<int> categoryIds = _categoryRepository.GetCategoryIds(out message);
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                // Xử lý lỗi (ví dụ: ghi log, hiển thị thông báo)
-            }
-
-            List<SelectListItem> selectListItems = categoryIds.Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString() // Hoặc lấy tên danh mục từ cơ sở dữ liệu
-            }).ToList();
-
-            ViewBag.ParentCategoryId = selectListItems;
+            ViewBag.ParentCategoryId = _categoryRepository.GetCategories_1(out message);
             return View(category);
         }
         [HttpPost]
@@ -104,6 +82,8 @@ namespace PRN222_Assignment_01.Controllers.Staff
                 ModelState.AddModelError(string.Empty, message);
                 return View(updateCategory);
             }
+            ViewBag.ParentCategoryId = _categoryRepository.GetCategories_1(out message);
+
             return View(updateCategory);
         }
 
@@ -123,7 +103,8 @@ namespace PRN222_Assignment_01.Controllers.Staff
         {
             var message = "";
             var category = _categoryRepository.GetCategory(id ?? 0, out message);
-            if(!message.IsNullOrEmpty())
+            ViewBag.ParentCategoryId = _categoryRepository.GetCategories_1(out message);
+            if (!message.IsNullOrEmpty())
             {
                 ModelState.AddModelError(string.Empty, message);
                 return View(category);

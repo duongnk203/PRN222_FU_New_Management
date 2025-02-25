@@ -1,4 +1,6 @@
-﻿@model PRN222_Assignment_01.Models.SystemAccount
+﻿@using PRN222_Assignment_01.Service
+@model PRN222_Assignment_01.Models.SystemAccount
+@inject RoleService roleService;
 
 @{
     ViewData["Title"] = "Create";
@@ -24,7 +26,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="AccountRole" class="control-label"></label>
-                <input asp-for="AccountRole" class="form-control" />
+                <select asp-for="AccountRole" class="form-control" asp-items="@roleService.GetRoles()">
+                    <option value="">-- Select Role --</option>
+                </select>
                 <span asp-validation-for="AccountRole" class="text-danger"></span>
             </div>
             <div class="form-group">

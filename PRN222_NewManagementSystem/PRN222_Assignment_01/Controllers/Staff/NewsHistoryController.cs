@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.Repositories;
 
 namespace PRN222_Assignment_01.Controllers.Staff
 {
+    [Authorize(Roles = "Staff")]
     public class NewsHistoryController : Controller
     {
         private readonly INewsArticalRepository _newsArticalRepository;
@@ -15,12 +18,11 @@ namespace PRN222_Assignment_01.Controllers.Staff
         public IActionResult NewsHistory(string searchString)
         {
             var message = "";
-            if (HttpContext.Session.GetString("AccountID") == null)
+            if ((User.FindFirst("AccountID")?.Value).IsNullOrEmpty())
             {
-                return RedirectToAction("Login", "Account");//Redirect to login if the user is not logged in.
+                return RedirectToAction("AccessDenied", "Authentication");
             }
-
-            int accountID = Int32.Parse(HttpContext.Session.GetString("AccountID"));
+            int accountID = Int32.Parse(User.FindFirst("AccountID")?.Value);
             var newsHistory = _newsArticalRepository.GetNewsArticlesByCreated(accountID, out message);
             if (!string.IsNullOrEmpty(searchString) && newsHistory.Count > 0)
             {

@@ -1,4 +1,6 @@
-﻿@model PRN222_Assignment_01.Models.SystemAccount
+﻿@using PRN222_Assignment_01.Service
+@model PRN222_Assignment_01.Models.SystemAccount;
+@inject RoleService roleService;
 
 @{
     ViewData["Title"] = "Details";
@@ -6,7 +8,12 @@
 }
 
 <h1>Details</h1>
-
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <div>
     <hr />
     <dl class="row">
@@ -23,10 +30,10 @@
             @Html.DisplayFor(model => model.AccountEmail)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AccountRole)
+            Role
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AccountRole)
+            @roleService.GetRoleName(Model.AccountRole)
         </dd>
 @*         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.AccountPassword)

@@ -1,6 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.ViewModel;
+using System.Security.Claims;
 
 namespace PRN222_Assignment_01.Repositories
 {
@@ -12,9 +15,10 @@ namespace PRN222_Assignment_01.Repositories
         void UpdateAccount(int id, SystemAccount updateAccount, out string message);
         void DeleteAccount(int id, out string message);
         List<SystemAccount> SearchAccount(string searchNameAccount);
-        int Login(AccountLogin accountLogin, out string message);
+        Task<(int role, string message)> Login(AccountLogin accountLogin, HttpContext httpContext);
+        Task<string> Logout(HttpContext httpContext);
         SystemAccount GetAccount(int id, out string message);
-        List<int> GetAccountIds(out string message);
+        string GetAccountName(int accountID, out string message);
     }
 
     public class SystemAccountRepository : ISystemAccountRepository
@@ -119,27 +123,34 @@ namespace PRN222_Assignment_01.Repositories
             _context.SaveChanges();
         }
 
-        public int Login(AccountLogin accountLogin, out string message)
+        public async Task<(int role, string message)> Login(AccountLogin accountLogin, HttpContext httpContext)
         {
-            message = "";
+            string message = "";
             if (accountLogin == null)
             {
                 message = "Tài khoản không đúng!";
-                return 0;
+                return (0, message);
             }
 
             bool checkEmailAdmin = accountLogin.AccountEmail.Equals(EMAIL_ADMIN);
             if (!IsEmailExit(accountLogin.AccountEmail) && !checkEmailAdmin)
             {
                 message = "Email không tồn tại!";
-                return 0;
+                return (0, message);
             }
 
             bool checkPassword = accountLogin.Password.Equals(PASSWORD_ADMIN);
             if (checkEmailAdmin && checkPassword)
             {
-                message = "";
-                return 3;
+                // Nếu là Admin
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Email, EMAIL_ADMIN),
+                    new Claim(ClaimTypes.Role, "Admin"),
+                    new Claim("AccountID", "0") // Admin không có ID trong DB
+                };
+                await SignInUser(httpContext, claims);
+                return (3, message);
             }
             else
             {
@@ -147,16 +158,35 @@ namespace PRN222_Assignment_01.Repositories
                 if (account == null)
                 {
                     message = "Mật khẩu không đúng!";
-                    return 0;
+                    return (0, message);
                 }
                 else
                 {
-                    _contextAccessor.HttpContext.Session.SetString("AccountID", account.AccountID + "");
-                    _contextAccessor.HttpContext.Session.SetString("AccountEmail", account.AccountEmail);
-                    return account.AccountRole;
+                    // Tạo Claims
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Email, account.AccountEmail),
+                        new Claim(ClaimTypes.Role, GetRole(account.AccountRole)),
+                        new Claim("AccountID", account.AccountID.ToString())
+                    };
+
+                    await SignInUser(httpContext, claims);
+                    return (account.AccountRole, "");
                 }
             }
         }
+        private async Task SignInUser(HttpContext httpContext, List<Claim> claims)
+        {
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties { IsPersistent = true }; // Cookie sẽ tồn tại sau khi đóng trình duyệt
+
+            await httpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties
+            );
+        }
+
 
         public SystemAccount GetAccount(int id, out string message)
         {
@@ -178,13 +208,50 @@ namespace PRN222_Assignment_01.Repositories
             }
         }
 
-        public List<int> GetAccountIds(out string message)
+        public string GetAccountName(int accountID, out string message)
         {
             message = "";
-            List<int> getAccountIds = _context.SystemAccounts.Select(x => x.AccountID).ToList().ConvertAll(x => (int)x);
-            if (getAccountIds.Count == 0)
-                message = "The list account is empty";
-            return getAccountIds;
+            var account = GetAccount(accountID, out message);
+            if (!string.IsNullOrEmpty(message) || account == null)
+            {
+                return "";
+            }
+            return account.AccountName;
         }
+
+        public async Task<string> Logout(HttpContext httpContext)
+        {
+            string message = "";
+            try
+            {
+                await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log nếu cần
+                message = $"Logout is invalid: {ex.Message}";
+            }
+            return message;
+        }
+
+
+        private string GetRole(int role)
+        {
+            var roles = _configuration.GetSection("AccountRole").Get<Dictionary<string, int>>();
+
+            if (roles != null)
+            {
+                foreach (var kvp in roles)
+                {
+                    if (kvp.Value == role)
+                    {
+                        return kvp.Key;
+                    }
+                }
+            }
+
+            return "Unknown"; // Trả về "Unknown" nếu không tìm thấy role
+        }
+
     }
 }

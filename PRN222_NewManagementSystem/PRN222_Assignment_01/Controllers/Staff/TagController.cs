@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.Repositories;
 
 namespace PRN222_Assignment_01.Controllers.Staff
 {
+    [Authorize(Roles = "Staff")]
     public class TagController : Controller
     {
         private ITagRepository _tagRepository;

@@ -4,7 +4,6 @@ using PRN222_Assignment_01.Repositories;
 
 namespace PRN222_Assignment_01.Controllers.Lecturer
 {
-    [Route("Lecturer/NewsArticleView")]
     public class NewsArticleViewController : Controller
     {
         private readonly INewsArticalRepository _newsArticalRepository;
@@ -12,7 +11,6 @@ namespace PRN222_Assignment_01.Controllers.Lecturer
         {
             _newsArticalRepository = newsArticalRepository;
         }
-        [Route("Index")]
         public IActionResult Index(string searchString)
         {
             var message = "";
@@ -34,7 +32,6 @@ namespace PRN222_Assignment_01.Controllers.Lecturer
             return View(newsArticles);
         }
 
-        [Route("Details")]
         public IActionResult Details(int? id)
         {
             var message = "";

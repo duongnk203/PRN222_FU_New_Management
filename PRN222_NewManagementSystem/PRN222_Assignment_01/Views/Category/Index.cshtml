@@ -33,7 +33,7 @@
                 @Html.DisplayNameFor(model => model.CategoryDesciption)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsActive)
+                Status
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ParentCategory)
@@ -51,10 +51,10 @@
                 @Html.DisplayFor(modelItem => item.CategoryDesciption)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
+                @(item.IsActive == true? "Active" : "Inactive")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ParentCategory.CategoryID)
+                @Html.DisplayFor(modelItem => item.ParentCategory.CategoryName)
             </td>
             <td>
                 <a asp-action="Update" asp-route-id="@item.CategoryID">Edit</a> |

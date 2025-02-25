@@ -1,0 +1,50 @@
+﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>;
+
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<form method="post" asp-action="GenerateReport">
+    <label>Select date range:</label>
+    <input type="date" name="startDate" required />
+    <input type="date" name="endDate" required />
+    <button type="submit" class="btn btn-primary">Filter data</button>
+</form>
+
+@if (Model != null && Model.Any()) // Nếu có dữ liệu, hiển thị bảng
+{
+    <h2 class="mt-4">Reports</h2>
+
+    <table class="table table-bordered table-striped table-hover text-center mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Tác giả</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model)
+            {
+                <tr>
+                    <td class="text-start">@article.NewsTitle</td>
+                    <td>@article.CreatedByID</td>
+                    <td>@(article.CreatedDate.HasValue ? article.CreatedDate.Value.ToString("yyyy-MM-dd") : "N/A")</td>
+                    <td>
+                        <span class="badge @(article.NewsStatus == true ? "bg-success" : "bg-danger")">
+                            @(article.NewsStatus == true ? "Active" : "Inactive")
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model != null) // Nếu không có dữ liệu nhưng Model không null
+{
+    <div class="alert alert-warning mt-3" role="alert">
+        No news articles found for the selected date range.
+    </div>
+}

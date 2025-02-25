@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.Service;
+using PRN222_Assignment_01.ViewModel;
 using System.Runtime.InteropServices;
+using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PRN222_Assignment_01.Repositories
 {
@@ -127,19 +131,21 @@ namespace PRN222_Assignment_01.Repositories
         void Create(int accountID, NewsArticle newsArticle, out string message);
         void Update(int id, int accountId, NewsArticle newsArticleUpdate, out NewsArticle newsArticleAfterUpdate,out string message);
         void Delete(int id, out string message);
-        List<NewsArticle> GetNewsArticles(int role, out string message);
+        List<NewsArticleViewModel> GetNewsArticles(int role, out string message);
         NewsArticle GetNewsArticle(int id, int role,out string message);
-        List<NewsArticle> GetNewsArticlesByCreated(int createdId, out string message);
+        List<NewsArticleViewModel> GetNewsArticlesByCreated(int createdId, out string message);
     }
 
     public class NewsArticalRepository : INewsArticalRepository
     {
         private readonly FUNewsManagementContext _context;
         private readonly IEmailService _emailService;
-        public NewsArticalRepository(FUNewsManagementContext context, IEmailService emailService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public NewsArticalRepository(FUNewsManagementContext context, IEmailService emailService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _emailService = emailService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void Create(int accountID, NewsArticle newsArticle, out string message)
@@ -165,8 +171,9 @@ namespace PRN222_Assignment_01.Repositories
             // Nếu bài viết được publish (NewsStatus == true) thì gửi email
             if (newsArticle.NewsStatus == true)
             {
+                string emailReceiver = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email).Value;
                 _emailService.SendEmail(
-                    "duongnk203@gmail.com",
+                    emailReceiver,
                     $"{newsArticle.NewsTitle}",
                     $"Author ID: {newsArticle.CreatedByID}. <br> Click <a href='{articleLink}'>here</a> to view the article.",
                     articleLink
@@ -209,17 +216,52 @@ namespace PRN222_Assignment_01.Repositories
             return newsArticle;
         }
 
-        public List<NewsArticle> GetNewsArticles(int role, out string message)
+        public List<NewsArticleViewModel> GetNewsArticles(int role, out string message)
         {
             message = "";
-            List<NewsArticle> newsArticles = _context.NewsArticles.ToList();
-            if(role == 2) newsArticles = newsArticles.Where(x => x.NewsStatus == true).ToList();
-            if (newsArticles.Count == 0)
+            try
             {
-                message = "The list news article is empty";
+                var query = (from news in _context.NewsArticles
+                             join updatedBy in _context.SystemAccounts
+                             on news.UpdatedByID equals updatedBy.AccountID into updatedByJoin
+                             from updatedBy in updatedByJoin.DefaultIfEmpty() // Đảm bảo không bị null
+                             select new NewsArticleViewModel
+                             {
+                                 NewsArticleID = news.NewsArticleID,
+                                 NewsTitle = news.NewsTitle,
+                                 Headline = news.Headline,
+                                 CreatedDate = news.CreatedDate,
+                                 NewsSource = news.NewsSource,
+                                 NewsStatus = news.NewsStatus,
+                                 ModifiedDate = news.ModifiedDate,
+                                 CategoryID = news.CategoryID,
+                                 CategoryName = news.Category.CategoryName,
+                                 CreatedByName = news.CreatedBy.AccountName,
+                                 CreatedByID = news.CreatedByID,
+                                 UpdatedByName = updatedBy != null ? updatedBy.AccountName : "N/A",
+                             }).ToList();
+
+                // Nếu role là 2 (Lecture), chỉ lấy bài viết có NewsStatus == true
+                if (role == 2)
+                {
+                    query = query.Where(x => x.NewsStatus == true).ToList();
+                }
+
+                if (!query.Any())
+                {
+                    message = "The list of news articles is empty.";
+                }
+
+                return query;
             }
-            return newsArticles;
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+                return new List<NewsArticleViewModel>(); // Trả về danh sách rỗng nếu có lỗi
+            }
         }
+
+
 
         public void Update(int id, int accountId, NewsArticle newsArticleUpdate, out NewsArticle newsArticleAfterUpdate, out string message)
         {
@@ -248,6 +290,7 @@ namespace PRN222_Assignment_01.Repositories
             newsArticle.NewsTitle = newsArticleUpdate.NewsTitle;
             newsArticle.NewsTags = newsArticleUpdate.NewsTags;
             newsArticle.UpdatedByID = (short)accountId;
+            newsArticle.CategoryID = newsArticleUpdate.CategoryID;
             newsArticle.ModifiedDate = DateTime.Now;
             _context.Update(newsArticle);
             _context.SaveChanges();
@@ -258,15 +301,40 @@ namespace PRN222_Assignment_01.Repositories
             return _context.NewsArticles.FirstOrDefault(x => x.NewsTitle.Equals(title)) != null;
         }
 
-        public List<NewsArticle> GetNewsArticlesByCreated(int id, out string message)
+        public List<NewsArticleViewModel> GetNewsArticlesByCreated(int id, out string message)
         {
             message = "";
-            List<NewsArticle> newsArticles = _context.NewsArticles.Where(x => x.CreatedByID == id).ToList();
+
+            List<NewsArticleViewModel> newsArticles = (
+                from news in _context.NewsArticles
+                join updatedBy in _context.SystemAccounts
+                on news.UpdatedByID equals updatedBy.AccountID into updatedByJoin
+                from updatedBy in updatedByJoin.DefaultIfEmpty()
+                where news.CreatedByID == id // 🔥 THÊM ĐIỀU KIỆN LỌC
+                select new NewsArticleViewModel
+                {
+                    NewsArticleID = news.NewsArticleID,
+                    NewsTitle = news.NewsTitle,
+                    Headline = news.Headline,
+                    CreatedDate = news.CreatedDate,
+                    NewsSource = news.NewsSource,
+                    NewsStatus = news.NewsStatus,
+                    ModifiedDate = news.ModifiedDate,
+                    CategoryID = news.CategoryID,
+                    CategoryName = news.Category.CategoryName,
+                    CreatedByName = news.CreatedBy.AccountName,
+                    CreatedByID = news.CreatedByID,
+                    UpdatedByName = updatedBy != null ? updatedBy.AccountName : "N/A",
+                }
+            ).ToList();
+
             if (newsArticles.Count == 0)
             {
                 message = "The list news article is empty";
             }
+
             return newsArticles;
         }
+
     }
 }

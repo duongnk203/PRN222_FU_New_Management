@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
+﻿@model IEnumerable<PRN222_Assignment_01.ViewModel.NewsArticleViewModel>
 
 @{
     ViewData["Title"] = "NewsHistory";
@@ -6,6 +6,12 @@
 }
 
 <h1>View News History</h1>
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <form asp-action="NewsHistory" method="get" class="mb-3">
     <div class="input-group">
         <input type="text" name="searchString" class="form-control" placeholder="Search news..." value="@Context.Request.Query["searchString"]">
@@ -25,25 +31,22 @@
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NewsContent)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.NewsSource)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NewsStatus)
-            </th>
+                Status
+            </th> <!-- Sửa lại tên cột -->
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedByID)
+                @Html.DisplayNameFor(model => model.UpdatedByName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryID)
+                @Html.DisplayNameFor(model => model.CategoryName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedByID)
+                @Html.DisplayNameFor(model => model.CreatedByName)
             </th>
             <th></th>
         </tr>
@@ -62,25 +65,22 @@
                     @Html.DisplayFor(modelItem => item.CreatedDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NewsContent)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.NewsSource)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NewsStatus)
+                    @(item.NewsStatus == true ? "Active" : "Inactive") <!-- Sửa lại chỗ hiển thị trạng thái -->
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedByID)
+                    @Html.DisplayFor(modelItem => item.UpdatedByName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ModifiedDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CategoryID)
+                    @Html.DisplayFor(modelItem => item.CategoryName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedByID)
+                    @Html.DisplayFor(modelItem => item.CreatedByName)
                 </td>
                 <td>
                     <a asp-controller="NewsArticle" asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |

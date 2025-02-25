@@ -6,7 +6,12 @@
 }
 
 <h1>Edit</h1>
-
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <h4>NewsArticle</h4>
 <hr />
 <div class="row">
@@ -46,22 +51,23 @@
             </div>
             <div class="form-group">
                 <label asp-for="NewsStatus" class="control-label"></label>
-                <input asp-for="NewsStatus" class="form-control" />
+                <select asp-for="NewsStatus" class="form-control">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
                 <span asp-validation-for="NewsStatus" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CreatedByID" class="control-label"></label>
-                <select disabled asp-for="CreatedByID" class="form-control" asp-items="ViewBag.CreatedByID"></select>
-                <span asp-validation-for="CreatedByID" class="text-danger"></span>
+                <label for="CreatedByName">Created By</label>
+                <input id="CreatedByName" name="CreatedByName" value="@ViewBag.CreatedByName" class="form-control" disabled/>
             </div>
             <div class="form-group">
-                <label asp-for="UpdatedByID" class="control-label"></label>
-                <input readonly asp-for="UpdatedByID" class="form-control" />
-                <span asp-validation-for="UpdatedByID" class="text-danger"></span>
+                <label for="UpdateByName">Update By</label>
+                <input id="UpdateByName" name="UpdateByName" value="@ViewBag.UpdateByName" class="form-control" disabled/>
             </div>
             <div class="form-group">
                 <label asp-for="ModifiedDate" class="control-label"></label>
-                <input readonly asp-for="ModifiedDate" class="form-control" />
+                <input disabled asp-for="ModifiedDate" class="form-control" />
                 <span asp-validation-for="ModifiedDate" class="text-danger"></span>
             </div>
             <div class="form-group">

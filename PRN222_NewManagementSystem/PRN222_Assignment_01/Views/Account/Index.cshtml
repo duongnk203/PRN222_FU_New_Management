@@ -1,4 +1,6 @@
-﻿@model IEnumerable<PRN222_Assignment_01.Models.SystemAccount>
+﻿@using PRN222_Assignment_01.Service
+@model IEnumerable<PRN222_Assignment_01.Models.SystemAccount>;
+@inject RoleService roleService;
 
 @{
     ViewData["Title"] = "Admin";
@@ -31,7 +33,7 @@
                 @Html.DisplayNameFor(model => model.AccountRole)
             </th>
             <th>
-                Mật khẩu
+                Password
             </th>
             <th></th>
         </tr>
@@ -47,7 +49,7 @@
                     @Html.DisplayFor(modelItem => item.AccountEmail)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AccountRole)
+                    @roleService.GetRoleName(item.AccountRole)
                 </td>
                 <td>
                     ******** @* Ẩn mật khẩu *@

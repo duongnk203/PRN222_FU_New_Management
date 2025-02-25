@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
+﻿@model IEnumerable<PRN222_Assignment_01.ViewModel.NewsArticleViewModel>
 
 @{
     ViewData["Title"] = "News Article";
@@ -12,7 +12,12 @@
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
-
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <table class="table">
     <thead>
         <tr>
@@ -25,67 +30,62 @@
             <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
-@*             <th>
-                @Html.DisplayNameFor(model => model.NewsContent)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.NewsSource)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NewsStatus)
-            </th>
+                Status
+            </th> <!-- Sửa lại tên cột -->
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedByID)
+                @Html.DisplayNameFor(model => model.UpdatedByName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryID)
+                @Html.DisplayNameFor(model => model.CategoryName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedByID)
+                @Html.DisplayNameFor(model => model.CreatedByName)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Headline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-@*             <td>
-                @Html.DisplayFor(modelItem => item.NewsContent)
-            </td> *@
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsSource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedByID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedByID)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> 
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Headline)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsSource)
+                </td>
+                <td>
+                    @(item.NewsStatus == true ? "Active" : "Inactive") <!-- Sửa lại chỗ hiển thị trạng thái -->
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedByName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifiedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedByName)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

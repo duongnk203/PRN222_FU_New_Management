@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PRN222_Assignment_01.Models;
 using PRN222_Assignment_01.Repositories;
@@ -15,6 +16,16 @@ var connectionsString = builder.Configuration.GetConnectionString("FUNewsManagem
 builder.Services.AddDbContext<FUNewsManagementContext>(options =>
  options.UseSqlServer(connectionsString));
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Authentication/Login";  // Trang login
+        options.LogoutPath = "/Authentication/Logout"; // Trang logout
+        options.AccessDeniedPath = "/Authentication/AccessDenied"; // Trang bị từ chối
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60);
@@ -22,13 +33,14 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
+builder.Services.AddSingleton<RoleService>();
 builder.Services.AddTransient<ISystemAccountRepository, SystemAccountRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<INewsArticalRepository, NewsArticalRepository>();
 builder.Services.AddTransient<ITagRepository, TagRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IReportRepository, ReportRepository>();
 
 var app = builder.Build();
 
@@ -50,6 +62,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Authentication}/{action=Login}/{id?}");
+    pattern: "{controller=NewsArticle}/{action=Index}/{id?}");
 
 app.Run();

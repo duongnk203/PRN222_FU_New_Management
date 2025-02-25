@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using PRN222_Assignment_01.Models;
@@ -6,7 +7,6 @@ using PRN222_Assignment_01.Repositories;
 
 namespace PRN222_Assignment_01.Controllers.Staff
 {
-    [Route("Staff/NewsArticleView")]
     public class NewsArticleController : Controller
     {
         private readonly INewsArticalRepository _newsArticalRepository;
@@ -19,12 +19,11 @@ namespace PRN222_Assignment_01.Controllers.Staff
             _systemAccountRepository = systemAccountRepository;
         }
 
-        [Route("Index")]
         public IActionResult Index(string searchString)
         {
             var message = "";
             var newsArticles = _newsArticalRepository.GetNewsArticles(0, out message);
-            if(!string.IsNullOrEmpty(searchString) && newsArticles.Count > 0)
+            if (!string.IsNullOrEmpty(searchString) && newsArticles.Count > 0)
             {
                 newsArticles = newsArticles
                     .Where(n => n.NewsTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)
@@ -39,11 +38,14 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticles);
         }
 
-        [Route("Details")]
         public IActionResult Details(int? id)
         {
             var message = "";
-            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? 0, 0,out message);
+            var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? 0, 0, out message);
+            ViewBag.CategoryName = _categoryRepository.GetCategory((int)newsArticle.CategoryID, out message).CategoryName;
+            ViewBag.CreatedByName = _systemAccountRepository.GetAccountName((int)(newsArticle.CreatedByID), out message);
+            ViewBag.UpdateByName = newsArticle.UpdatedByID == null ? "" : _systemAccountRepository.GetAccountName((int)newsArticle.UpdatedByID, out message);
+
             if (!message.IsNullOrEmpty() || newsArticle == null)
             {
                 ModelState.AddModelError(string.Empty, message);
@@ -52,62 +54,43 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticle);
         }
 
-        [Route("Create")]
+        [Authorize(Roles = "Staff")]
         public IActionResult Create()
         {
             var message = "";
-            var categoryIds = _categoryRepository.GetCategoryIds(out message);
+            ViewBag.CategoryID = _categoryRepository.GetCategories_1(out message);
 
-            ViewBag.CategoryId = categoryIds.Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
-            ViewBag.CreatedById = _systemAccountRepository.GetAccountIds(out message).Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
+            
             return View();
         }
 
-        [Route("Create")]
+        [Authorize(Roles = "Staff")]
         [HttpPost]
         public IActionResult Create(NewsArticle newsArticle)
         {
             var message = "";
-            if (HttpContext.Session.GetString("AccountID") == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            var accountId = Int32.Parse(HttpContext.Session.GetString("AccountID"));
-            _newsArticalRepository.Create(accountId, newsArticle, out message);
+            int accountID = Int32.Parse(User.FindFirst("AccountID")?.Value);
+            _newsArticalRepository.Create(accountID, newsArticle, out message);
+            ViewBag.CategoryID = _categoryRepository.GetCategories_1(out message);
+
             if (!string.IsNullOrEmpty(message))
             {
                 ModelState.AddModelError(string.Empty, message);
                 return View(newsArticle);
             }
-            return View(newsArticle);
+            return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Staff")]
         [Route("Edit")]
         public IActionResult Edit(int? id)
         {
             var message = "";
             var newsArticle = _newsArticalRepository.GetNewsArticle(id ?? 0, 0, out message);
+            ViewBag.CategoryID = _categoryRepository.GetCategories_1(out message);
 
-            var categoryIds = _categoryRepository.GetCategoryIds(out message);
-
-            ViewBag.CategoryId = categoryIds.Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
-            ViewBag.CreatedById = _systemAccountRepository.GetAccountIds(out message).Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
+            ViewBag.CreatedByName = _systemAccountRepository.GetAccountName((int)(newsArticle.CreatedByID), out message);
+            ViewBag.UpdateByName = newsArticle.UpdatedByID == null ? "": _systemAccountRepository.GetAccountName((int)newsArticle.UpdatedByID, out message);
 
             if (newsArticle == null || !message.IsNullOrEmpty())
             {
@@ -118,30 +101,21 @@ namespace PRN222_Assignment_01.Controllers.Staff
             return View(newsArticle);
         }
 
-        [Route("Edit")]
+        [Authorize(Roles = "Staff")]
         [HttpPost]
-        public IActionResult Edit(int? id, NewsArticle newsArticleUpdate)
+        public IActionResult Edit(NewsArticle newsArticleUpdate)
         {
             var message = "";
-            if (HttpContext.Session.GetString("AccountID") == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            var categoryIds = _categoryRepository.GetCategoryIds(out message);
+            int accountID = Int32.Parse(User.FindFirst("AccountID")?.Value);
+            ViewBag.CategoryID = _categoryRepository.GetCategories_1(out message);
 
-            ViewBag.CategoryId = categoryIds.Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
-            var accountId = Int32.Parse(HttpContext.Session.GetString("AccountID"));
-            _newsArticalRepository.Update(id ?? 0, accountId, newsArticleUpdate, out newsArticleUpdate, out message);
+            _newsArticalRepository.Update(newsArticleUpdate.NewsArticleID, accountID, newsArticleUpdate, out newsArticleUpdate, out message);
             if (!message.IsNullOrEmpty())
             {
                 ModelState.AddModelError(string.Empty, message);
                 return View(newsArticleUpdate);
             }
-            return View(newsArticleUpdate);
+            return RedirectToAction(nameof(Index));
         }
 
         [Route("Delete")]

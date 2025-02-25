@@ -6,7 +6,12 @@
 }
 
 <h1>Tag</h1>
-
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <p>
     <a asp-action="Create">Create New Tag</a>
 </p>

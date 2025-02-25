@@ -1,9 +1,18 @@
-﻿@model IEnumerable<PRN222_Assignment_01.Models.NewsArticle>
+﻿@model IEnumerable<PRN222_Assignment_01.ViewModel.NewsArticleViewModel>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_LayoutStaff.cshtml";
+    ViewData["Title"] = "News Articles";
+    var userRole = HttpContextAccessor.HttpContext?.User?.FindFirst("role")?.Value
+                   ?? HttpContextAccessor.HttpContext?.User?.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+    Layout = userRole switch
+    {
+        "Staff" => "~/Views/Shared/_LayoutStaff.cshtml",
+        "Lecturer" => "~/Views/Shared/_LayoutLecturer.cshtml",
+        _ => "~/Views/Shared/_LayoutGuest.cshtml"
+    };
 }
+
 
 <h1>View news article</h1>
 
@@ -13,10 +22,19 @@
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
-<p>
-    <a asp-action="Create">Create New News Article</a>
-</p>
+@if (userRole == "Staff")
+{
+    <p>
+        <a asp-action="Create">Create New News Article</a>
+    </p>
 
+}
+@if (TempData["Message"] != null && !string.IsNullOrEmpty(TempData["Message"].ToString()))
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <table class="table">
     <thead>
         <tr>
@@ -29,26 +47,23 @@
             <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
-            @*             <th>
-                @Html.DisplayNameFor(model => model.NewsContent)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.NewsSource)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NewsStatus)
-            </th>
+                Status
+            </th> <!-- Sửa lại tên cột -->
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedByID)
+                @Html.DisplayNameFor(model => model.UpdatedByName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryID)
+                @Html.DisplayNameFor(model => model.CategoryName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedByID)
+                @Html.DisplayNameFor(model => model.CreatedByName)
             </th>
             <th></th>
         </tr>
@@ -66,31 +81,38 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.CreatedDate)
                 </td>
-                @*             <td>
-                @Html.DisplayFor(modelItem => item.NewsContent)
-            </td> *@
                 <td>
                     @Html.DisplayFor(modelItem => item.NewsSource)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NewsStatus)
+                    @(item.NewsStatus == true ? "Active" : "Inactive") <!-- Sửa lại chỗ hiển thị trạng thái -->
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedByID)
+                    @Html.DisplayFor(modelItem => item.UpdatedByName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ModifiedDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CategoryID)
+                    @Html.DisplayFor(modelItem => item.CategoryName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedByID)
+                    @Html.DisplayFor(modelItem => item.CreatedByName)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.NewsArticleID" onclick="return confirm('Are you sure delete this news article?')">Delete</a>
+                    @if (userRole == "Staff")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.NewsArticleID">Edit</a>
+
+                        <span>|</span>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.NewsArticleID">Details</a>
+                    @if (userRole == "Staff")
+                    {
+                        <span>|</span>
+
+                        <a asp-action="Delete" asp-route-id="@item.NewsArticleID" onclick="return confirm('Are you sure delete this news article?')">Delete</a>
+                    }
                 </td>
             </tr>
         }

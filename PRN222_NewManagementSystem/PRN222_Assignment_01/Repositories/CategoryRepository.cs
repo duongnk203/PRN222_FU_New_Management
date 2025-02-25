@@ -1,4 +1,5 @@
-﻿using PRN222_Assignment_01.Models;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using PRN222_Assignment_01.Models;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 
@@ -11,7 +12,7 @@ namespace PRN222_Assignment_01.Repositories
         void Delete(int id, out string message);
         List<Category> GetCategories(out string messsage);
         Category GetCategory(int id, out string message);
-        List<int> GetCategoryIds(out string messsage);
+        List<SelectListItem> GetCategories_1(out string messsage);
     }
     public class CategoryRepository : ICategoryRepository
     {
@@ -81,11 +82,23 @@ namespace PRN222_Assignment_01.Repositories
             return category;
         }
 
-        public List<int> GetCategoryIds(out string messsage)
+        public List<SelectListItem> GetCategories_1(out string message)
         {
-            messsage = "";
-            List<short> categoryIds = _context.Categories.Select(x => x.CategoryID).ToList();
-            return categoryIds.ConvertAll(x => (int)x);
+            message = "";
+            try
+            {
+                return _context.Categories
+                    .ToDictionary(x => (int)x.CategoryID, x => x.CategoryName).Select(x => new SelectListItem
+                    {
+                        Value = x.Key.ToString(),
+                        Text = x.Value.ToString() // Hoặc lấy tên danh mục từ cơ sở dữ liệu
+                    }).ToList();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                return new List<SelectListItem>(); 
+            }
         }
 
         public void Update(int id, Category newCategory, out string message)
